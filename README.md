@@ -4,9 +4,36 @@
 > 접수: 2026.10.21 ~ 2026.11.15 23:59 · 분야: 인카 엔터테인먼트
 > **Pleos Vehicle SDK 2.3.2 로 실제 구현 · Pleos Connect Emulator v2.1.0 에서 동작 확인**
 >
-> **다운로드:** [APK](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-v1.0.apk) · [시연 영상 (78초)](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) · [릴리스 v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0)
+> **APK:** [`apk/채종원_운명의창문_release.apk`](apk/) (release 빌드) · **시연 영상 (78초):** [다운로드](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) · **릴리스:** [v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0)
 
 ![준비 화면](docs/images/01-setup.jpg)
+
+## 심사용 빠른 실행
+
+**APK 위치:** 저장소 [`apk/채종원_운명의창문_release.apk`](apk/) (서명된 release 빌드, versionName 1.0). [Release v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0) 에도 같은 파일을 올려 두었습니다.
+
+**테스트 환경**
+| 항목 | 내용 |
+| --- | --- |
+| 에뮬레이터 | Pleos Connect Emulator v2.1.0 (Android 14, API 34, Automotive) |
+| 차량 상태 조작 | Pleos Connect Virtual Console (에뮬레이터 내장) |
+| 확인한 호스트 | macOS (Apple Silicon), Android Emulator 37 |
+| 최소 요구 | Android API 28 이상 |
+
+**필요한 설정**
+1. Android Studio → SDK Manager → SDK Update Sites 에 Pleos Connect 시스템 이미지 추가
+   (Mac: `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-arm64-sys-img.xml`, Windows/Linux: `.../crp-sys-img.xml`) → API 34 Pleos Connect 이미지 설치 → Automotive AVD 생성 (RAM 4GB, Cold boot)
+2. 에뮬레이터 부팅 후 Virtual Console 연결: `adb forward tcp:8088 tcp:8088` → 브라우저 `http://127.0.0.1:8088/` → **하단이 DDS ONLINE 인지 확인** (이 상태여야 앱의 조명·창문 제어가 차량 상태에 반영됩니다)
+3. Virtual Console 에서 기어 **P** 확인
+
+**실행 방법**
+1. `adb install "apk/채종원_운명의창문_release.apk"` → 앱 목록에서 "운명의 창문" 실행 (차량 퍼미션은 설치 시 자동 허용)
+2. 상단에 "Pleos 차량 연결됨"이 보이면 게임 모드 선택 → **룰렛 돌리기**
+3. 결과 화면에서 **완료 · 원상복구** 를 누르면 창문이 닫히고 조명이 돌아옵니다
+4. 연출 전환 확인: Virtual Console 에서 앞 와이퍼를 Low 로 바꾸면 "독서등 연출 · 비 감지"로 바뀌고 창문 없이 조명만으로 지목합니다
+5. 안전 확인: 결과 화면(창문 열림)에서 기어를 P 밖으로 옮기면 즉시 중단되고 창문이 닫힙니다
+
+> Pleos 차량 서비스가 없는 일반 Android 기기에서는 "데모 모드"로 화면 연출만 동작합니다.
 
 ---
 
@@ -134,14 +161,14 @@ app/src/main/java/com/fatewindow/app/
 app/src/test/                     단위테스트 16개 (게임 흐름·안전·미션·룰렛)
 ```
 
-- **빌드:** `./gradlew assembleDebug` (JDK 17, Android SDK 34). `main` 푸시 시 GitHub Actions 가 테스트 후 디버그 APK 를 아티팩트로 올린다.
+- **빌드:** `./gradlew assembleRelease` (JDK 17, Android SDK 34). release 서명 정보는 저장소 밖 `~/.android/fate-window-signing/keystore.properties` 에서 읽는다. `main` 푸시 시 GitHub Actions 가 단위테스트와 디버그 빌드를 확인한다.
 - **에뮬레이터:** Android Studio SDK Manager 에 Pleos Connect 시스템 이미지(Mac: `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-arm64-sys-img.xml`)를 추가해 Automotive AVD 생성.
 - **Virtual Console (필수):** `adb forward tcp:8088 tcp:8088` → 브라우저 `http://127.0.0.1:8088/`. 하단이 **DDS ONLINE** 이어야 앱의 제어가 차량 상태에 반영된다. 기어·착좌·와이퍼·전조등을 여기서 바꿔 티어 전환과 안전 중단을 시연할 수 있다.
 
 ## 11. 제출물
 
 - [x] 기획서 (본 문서)
-- [x] GitHub 저장소 (소스 코드) + [APK](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-v1.0.apk)
+- [x] GitHub 저장소 (소스 코드) + APK (`apk/` 폴더, release 빌드)
 - [x] [시연 영상](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) (에뮬레이터 + Virtual Console 실제 구동, 78초)
 - [ ] 1차 접수 (~11/15 23:59)
 

@@ -1,6 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+}
+
+// release 서명 정보는 저장소 밖에 둔다 (기본: ~/.android/fate-window-signing/keystore.properties,
+// 환경변수 FATE_WINDOW_SIGNING 으로 경로 변경 가능). 파일이 없으면 release 는 서명 없이 빌드된다.
+val signingProps = Properties().apply {
+    val path = System.getenv("FATE_WINDOW_SIGNING")
+        ?: "${System.getProperty("user.home")}/.android/fate-window-signing/keystore.properties"
+    val f = file(path)
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -15,9 +26,21 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        if (signingProps.getProperty("storeFile") != null) {
+            create("release") {
+                storeFile = file(signingProps.getProperty("storeFile"))
+                storePassword = signingProps.getProperty("storePassword")
+                keyAlias = signingProps.getProperty("keyAlias")
+                keyPassword = signingProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {

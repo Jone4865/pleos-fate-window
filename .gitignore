@@ -12,3 +12,5 @@ local.properties
 *.apk
 *.keystore
 !debug.keystore
+# 공모전 제출용 release APK 는 저장소에 포함 (공식 안내: apk/ 폴더)
+!apk/*.apk
