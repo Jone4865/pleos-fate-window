@@ -27,7 +27,11 @@ import com.fatewindow.app.vehicle.StubVehicleController
 import com.fatewindow.app.vehicle.VehicleController
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -43,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     private val modeCards = mutableMapOf<GameMode, MaterialCardView>()
     private var lastRound: RoundResult? = null
     private var mission: Mission? = null
+    private var ui = Ui.SETUP
+    private var roundJob: Job? = null
+    private var safetyJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,15 +178,22 @@ class MainActivity : AppCompatActivity() {
     private fun startRound() {
         render(Ui.SPINNING)
         binding.spinSeat.text = ""
-        lifecycleScope.launch {
+        roundJob = lifecycleScope.launch {
             try {
                 lastRound = controller.playRound(
                     windowOptionEnabled = binding.windowSwitch.isChecked,
                     ambientOptionEnabled = binding.ambientSwitch.isChecked
                 ) { event -> onRoundEvent(event) }
+                watchGearDuringResult()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: GameController.DrivingStartedException) {
+                controller.emergencyReset()
+                failRound(e.message)
             } catch (e: GameController.NotParkedException) {
                 failRound(e.message)
             } catch (e: Exception) {
+                controller.emergencyReset()
                 failRound(e.message ?: "오류가 발생했어요")
             }
         }
@@ -244,8 +258,25 @@ class MainActivity : AppCompatActivity() {
         mission?.let { vehicle.speak(it.speech) }
     }
 
+    /** 결과 화면(창문 열린 상태)에서 기어가 P 를 벗어나면 즉시 창문 닫고 조명 복귀 */
+    private fun watchGearDuringResult() {
+        safetyJob?.cancel()
+        safetyJob = lifecycleScope.launch {
+            while (isActive && ui == Ui.RESULT) {
+                delay(800)
+                if (ui == Ui.RESULT && !vehicle.isParked()) {
+                    lastRound = null
+                    controller.emergencyReset()
+                    failRound(GameController.DrivingStartedException().message)
+                    return@launch
+                }
+            }
+        }
+    }
+
     /** 미션 수행 후 "완료": 창문 닫고 조명 복귀 → 다음 라운드 */
     private fun finishRound() {
+        safetyJob?.cancel()
         val round = lastRound ?: return render(Ui.SETUP)
         binding.finishButton.isEnabled = false
         binding.rerollButton.isEnabled = false
@@ -271,6 +302,7 @@ class MainActivity : AppCompatActivity() {
     // ---------------- 화면 상태 ----------------
 
     private fun render(ui: Ui) {
+        this.ui = ui
         binding.setupPanel.isVisible = ui == Ui.SETUP
         binding.spinPanel.isVisible = ui == Ui.SPINNING
         binding.resultPanel.isVisible = ui == Ui.RESULT
@@ -297,6 +329,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun hasPleosVehicleService(): Boolean =
         runCatching { packageManager.getPackageInfo(PLEOS_VEHICLE_SERVICE, 0) }.isSuccess
+
+    /** 라운드 중 앱이 화면에서 사라지면(홈 버튼·다른 앱·종료) 창문이 열린 채 남지 않게 복구 */
+    override fun onStop() {
+        if (ui != Ui.SETUP) {
+            roundJob?.cancel()
+            safetyJob?.cancel()
+            lastRound = null
+            lifecycleScope.launch(NonCancellable) { controller.emergencyReset() }
+            binding.blackout.animate().cancel()
+            binding.blackout.alpha = 0f
+            binding.blackout.visibility = View.GONE
+            binding.cabinView.resetRound()
+            render(Ui.SETUP)
+        }
+        super.onStop()
+    }
 
     override fun onDestroy() {
         vehicle.release()

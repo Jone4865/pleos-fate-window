@@ -22,9 +22,16 @@ class GameControllerTest {
     ) : VehicleController {
         val calls = mutableListOf<String>()
         val spot = mutableMapOf<Seat, Boolean>()
+        /** n 번째 기어 확인부터 주행(D)으로 바뀜. null 이면 계속 parked 값 사용 */
+        var driveFromCheck: Int? = null
+        private var gearChecks = 0
         override suspend fun readCapabilities() = caps
         override suspend fun occupiedSeats() = seats
-        override suspend fun isParked() = parked
+        override suspend fun isParked(): Boolean {
+            gearChecks++
+            val d = driveFromCheck
+            return if (d != null && gearChecks >= d) false else parked
+        }
         override suspend fun setSpotlight(seat: Seat, on: Boolean) { spot[seat] = on; calls += "spot ${seat.label} $on" }
         override suspend fun setAmbient(seat: Seat, on: Boolean) { calls += "ambient ${seat.label} $on" }
         override suspend fun allLightsOff() { spot.keys.forEach { spot[it] = false }; calls += "blackout" }
@@ -89,4 +96,28 @@ class GameControllerTest {
         GameController(FakeVehicle(caps(), parked = false)).playRound(true, true) {}
     }
 
+
+    @Test fun driving_mid_spin_stops_round_before_reveal() = runTest {
+        val v = FakeVehicle(caps()).apply { driveFromCheck = 4 }   // 시작 확인(1) 후 룰렛 도중 주행
+        val c = GameController(v)
+        var thrown: Throwable? = null
+        try { c.playRound(true, true) {} } catch (e: GameController.DrivingStartedException) { thrown = e }
+        assertTrue(thrown is GameController.DrivingStartedException)
+        assertTrue("당첨 연출 전에 멈춰야 함", v.calls.none { it.startsWith("open") })
+        c.emergencyReset()
+        assertEquals("restore", v.calls.last())
+    }
+
+    @Test fun emergency_reset_closes_the_window_opened_this_round() = runTest {
+        val v = FakeVehicle(caps())
+        val c = GameController(v)
+        val r = c.playRound(true, true) {}
+        v.calls.clear()
+        c.emergencyReset()
+        assertEquals(listOf("close ${r.winner.label}", "restore"), v.calls)
+        // 두 번 불러도 창문을 다시 건드리지 않는다
+        v.calls.clear()
+        c.emergencyReset()
+        assertEquals(listOf("restore"), v.calls)
+    }
 }

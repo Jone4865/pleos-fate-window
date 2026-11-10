@@ -23,6 +23,15 @@ class GameController(
     private val engine: RouletteEngine = RouletteEngine()
 ) {
     class NotParkedException : Exception("주차(P) 후 이용하세요.")
+    class DrivingStartedException : Exception("주행이 감지되어 게임을 멈췄어요. 창문을 닫고 조명을 되돌렸어요.")
+
+    /** 이번 라운드에서 연 창문 (비상 복구용) */
+    private var openedWindow: Seat? = null
+
+    /** 라운드 도중 기어가 P 를 벗어나면 즉시 중단 */
+    private suspend fun guardParked() {
+        if (!vehicle.isParked()) throw DrivingStartedException()
+    }
 
     /** emit 으로 UI 에 이벤트 전달 */
     suspend fun playRound(
@@ -58,6 +67,7 @@ class GameController(
         // 2) 룰렛 회전: 이전 좌석 끄고 현재 좌석 켜기
         var prev: Seat? = null
         for ((seat, d) in engine.spinSequence(players, winner)) {
+            guardParked()
             if (prev != null && prev != seat) rouletteLight(prev, false)
             rouletteLight(seat, true)
             prev = seat
@@ -72,9 +82,13 @@ class GameController(
         delay(1500)
 
         // 4) 티어별 당첨 연출: 당첨 좌석만 점등 (+창문)
+        guardParked()
         if (useAmbient) vehicle.setAmbient(winner, true)
         vehicle.setSpotlight(winner, true)
-        if (windowReveal) vehicle.openWindow(winner, positionPercent = 50)
+        if (windowReveal) {
+            openedWindow = winner
+            vehicle.openWindow(winner, positionPercent = 50)
+        }
         vehicle.speak("${winner.label}입니다!")
         emit(RoundEvent.Winner(winner, tier, windowReveal))
 
@@ -84,6 +98,17 @@ class GameController(
     /** "완료": 열었던 창문 닫고 조명 원상복구 */
     suspend fun resetRound(result: RoundResult) {
         if (result.windowOpened) vehicle.closeWindow(result.winner)
+        openedWindow = null
+        vehicle.restoreLights()
+    }
+
+    /**
+     * 비상 복구: 주행 시작·앱 종료 등으로 라운드가 끊겼을 때.
+     * 이번 라운드에 연 창문을 닫고 조명을 암전 전 상태로 되돌린다. 여러 번 불러도 안전하다.
+     */
+    suspend fun emergencyReset() {
+        openedWindow?.let { vehicle.closeWindow(it) }
+        openedWindow = null
         vehicle.restoreLights()
     }
 }

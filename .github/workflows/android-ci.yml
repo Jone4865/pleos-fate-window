@@ -20,6 +20,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # 기본값('tools platform-tools')의 'tools' 패키지는 더 이상 없어서 실패함 → 필요한 것만 명시
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
