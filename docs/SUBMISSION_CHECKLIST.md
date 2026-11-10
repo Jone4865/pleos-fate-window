@@ -5,7 +5,7 @@
 ## 제출물
 - [x] 기획서 (`README.md`, 실제 앱 화면 포함)
 - [x] 앱 소스코드 — https://github.com/Jone4865/pleos-fate-window (공개)
-- [x] APK — 저장소 `apk/채종원_운명의창문_release.apk` (서명된 release 빌드, 공식 파일명 규칙 `팀명_앱이름_release.apk`) + Release v1.0
+- [x] APK — 저장소 `apk/운명의창문팀_운명의창문_release.apk` (서명된 release 빌드, 공식 파일명 규칙 `팀명_앱이름_release.apk`) + Release v1.0
 - [x] 시연 영상 완성본 — 78초, 1920×1080, 자막·나레이션·효과음·타이틀 카드 포함 (편집 도구: `tools/demo-video/`)
 - [x] 영상 업로드 — 릴리스 v1.0: https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4
 - [x] 접수양식(기획서) 작성 — 서명·동의 체크·휴대폰번호만 남음

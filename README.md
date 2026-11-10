@@ -4,13 +4,13 @@
 > 접수: 2026.10.21 ~ 2026.11.15 23:59 · 분야: 인카 엔터테인먼트
 > **Pleos Vehicle SDK 2.3.2 로 실제 구현 · Pleos Connect Emulator v2.1.0 에서 동작 확인**
 >
-> **APK:** [`apk/채종원_운명의창문_release.apk`](apk/) (release 빌드) · **시연 영상 (78초):** [다운로드](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) · **릴리스:** [v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0)
+> **APK:** [`apk/운명의창문팀_운명의창문_release.apk`](apk/) (release 빌드) · **시연 영상 (78초):** [다운로드](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) · **릴리스:** [v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0)
 
 ![준비 화면](docs/images/01-setup.jpg)
 
 ## 심사용 빠른 실행
 
-**APK 위치:** 저장소 [`apk/채종원_운명의창문_release.apk`](apk/) (서명된 release 빌드, versionName 1.0). [Release v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0) 에도 같은 파일을 올려 두었습니다.
+**APK 위치:** 저장소 [`apk/운명의창문팀_운명의창문_release.apk`](apk/) (서명된 release 빌드, versionName 1.0). [Release v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0) 에도 같은 파일을 올려 두었습니다.
 
 **테스트 환경**
 | 항목 | 내용 |
@@ -27,7 +27,7 @@
 3. Virtual Console 에서 기어 **P** 확인
 
 **실행 방법**
-1. `adb install "apk/채종원_운명의창문_release.apk"` → 앱 목록에서 "운명의 창문" 실행 (차량 퍼미션은 설치 시 자동 허용)
+1. `adb install "apk/운명의창문팀_운명의창문_release.apk"` → 앱 목록에서 "운명의 창문" 실행 (차량 퍼미션은 설치 시 자동 허용)
 2. 상단에 "Pleos 차량 연결됨"이 보이면 게임 모드 선택 → **룰렛 돌리기**
 3. 결과 화면에서 **완료 · 원상복구** 를 누르면 창문이 닫히고 조명이 돌아옵니다
 4. 연출 전환 확인: Virtual Console 에서 앞 와이퍼를 Low 로 바꾸면 "독서등 연출 · 비 감지"로 바뀌고 창문 없이 조명만으로 지목합니다
