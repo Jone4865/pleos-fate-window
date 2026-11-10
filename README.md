@@ -3,6 +3,8 @@
 > 현대자동차그룹 차량용 앱 개발 공모전 (Code your App into Pleos App Market) 출품작
 > 접수: 2026.10.21 ~ 2026.11.15 23:59 · 분야: 인카 엔터테인먼트
 > **Pleos Vehicle SDK 2.3.2 로 실제 구현 · Pleos Connect Emulator v2.1.0 에서 동작 확인**
+>
+> **다운로드:** [APK](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-v1.0.apk) · [시연 영상 (78초)](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) · [릴리스 v1.0](https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0)
 
 ![준비 화면](docs/images/01-setup.jpg)
 
@@ -139,8 +141,8 @@ app/src/test/                     단위테스트 16개 (게임 흐름·안전·
 ## 11. 제출물
 
 - [x] 기획서 (본 문서)
-- [x] GitHub 저장소 (소스 코드 + CI 빌드 APK)
-- [x] 시연 영상 (에뮬레이터 + Virtual Console 녹화)
+- [x] GitHub 저장소 (소스 코드) + [APK](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-v1.0.apk)
+- [x] [시연 영상](https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4) (에뮬레이터 + Virtual Console 실제 구동, 78초)
 - [ ] 1차 접수 (~11/15 23:59)
 
 ## 12. 리스크

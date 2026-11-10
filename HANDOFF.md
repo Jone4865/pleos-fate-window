@@ -68,7 +68,7 @@ docs/SUBMISSION_CHECKLIST.md  제출 체크리스트
 - [x] 주행(기어 P 이탈) 감지 시 즉시 중단 + 창문 닫기·조명 복구, 앱 이탈 시 복구
 - [x] README(기획서)를 실제 구현·화면 기준으로 갱신
 - [x] 시연 영상 편집 완료 (78초, 자막·나레이션·효과음). 다시 편집하려면 `tools/demo-video/`
-- [ ] 영상 업로드
+- [x] 릴리스 v1.0 (APK + 시연 영상): https://github.com/Jone4865/pleos-fate-window/releases/tag/v1.0
 - [ ] (선택) 공모전 문의처에 "Vehicle Control 준비 중 상태에서 에뮬레이터 시연 출품 가능 여부" 확인
 - [ ] 1차 접수(~11/15 23:59): 기획서 + repo(소스+APK) + 영상 제출
 

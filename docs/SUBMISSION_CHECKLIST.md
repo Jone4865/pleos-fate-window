@@ -5,9 +5,9 @@
 ## 제출물
 - [x] 기획서 (`README.md`, 실제 앱 화면 포함)
 - [x] 앱 소스코드 — https://github.com/Jone4865/pleos-fate-window (공개)
-- [x] APK — GitHub Actions `Android CI` 실행 결과의 `fate-window-debug-apk` 아티팩트
+- [x] APK — 릴리스 v1.0 (로그인 없이 다운로드): https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-v1.0.apk
 - [x] 시연 영상 완성본 — 78초, 1920×1080, 자막·나레이션·효과음·타이틀 카드 포함 (편집 도구: `tools/demo-video/`)
-- [ ] 영상 업로드 (공모전 제출 양식에 맞춰)
+- [x] 영상 업로드 — 릴리스 v1.0: https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4
 - [ ] 1차 접수
 
 ## 완료한 것 (2026-11-10)
