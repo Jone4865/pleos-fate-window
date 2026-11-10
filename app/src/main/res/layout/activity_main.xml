@@ -1,63 +1,253 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 차량 디스플레이(가로, 원거리 시청) 기준: 본문 24sp+, 제목 56sp+, 터치 영역 96dp+ -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
-    android:background="#0B0B14">
+    android:background="@drawable/bg_screen">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingStart="32dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="48dp"
+        android:paddingBottom="32dp">
+
+        <!-- 왼쪽: 실내 일러스트 (실제 조명·창문 상태를 그대로 보여줌) -->
+        <com.fatewindow.app.ui.CabinView
+            android:id="@+id/cabinView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="40" />
+
+        <!-- 오른쪽: 진행 패널 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="32dp"
+            android:layout_weight="60"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/app_name"
+                    android:textColor="@color/fw_gold"
+                    android:textSize="60sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tierPill"
+                    style="@style/FateWindow.Pill"
+                    android:backgroundTint="#1F3A44"
+                    android:textColor="@color/fw_cyan" />
+
+                <TextView
+                    android:id="@+id/connPill"
+                    style="@style/FateWindow.Pill"
+                    android:layout_marginStart="16dp"
+                    android:backgroundTint="#22233A"
+                    android:textColor="@color/fw_text_dim" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="차가 진행자가 되는 실내 룰렛 · 주차 중 전용"
+                android:textColor="@color/fw_text_dim"
+                android:textSize="24sp" />
+
+            <!-- 준비 화면 -->
+            <LinearLayout
+                android:id="@+id/setupPanel"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="28dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView style="@style/FateWindow.Section" android:text="게임 모드" />
+
+                <GridLayout
+                    android:id="@+id/modeGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:columnCount="2"
+                    android:useDefaultMargins="false" />
+
+                <TextView
+                    android:id="@+id/optionsLabel"
+                    style="@style/FateWindow.Section"
+                    android:layout_marginTop="28dp" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/stakeGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    app:chipSpacingHorizontal="14dp"
+                    app:chipSpacingVertical="14dp" />
+            </LinearLayout>
+
+            <!-- 룰렛 진행 화면 -->
+            <LinearLayout
+                android:id="@+id/spinPanel"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/spinTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="두구두구"
+                    android:textColor="@color/fw_gold"
+                    android:textSize="110sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/spinSeat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/fw_text"
+                    android:textSize="56sp" />
+            </LinearLayout>
+
+            <!-- 결과 화면 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/resultPanel"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="28dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                app:cardBackgroundColor="#1B1810"
+                app:cardCornerRadius="36dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/fw_gold"
+                app:strokeWidth="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="48dp">
+
+                    <TextView
+                        android:id="@+id/winnerText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/fw_gold"
+                        android:textSize="84sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tierText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/fw_text_dim"
+                        android:textSize="26sp" />
+
+                    <TextView
+                        android:id="@+id/missionTag"
+                        style="@style/FateWindow.Pill"
+                        android:layout_marginTop="36dp"
+                        android:backgroundTint="@color/fw_gold"
+                        android:textColor="@color/fw_bg" />
+
+                    <LinearLayout
+                        android:id="@+id/missionLines"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/messageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/fw_error"
+                android:textSize="28sp"
+                android:visibility="gone" />
+
+            <!-- 하단: 연출 설정 + 버튼 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/settingsBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/windowSwitch"
+                        style="@style/FateWindow.Switch"
+                        android:checked="true"
+                        android:text="창문 연출  (비·밤엔 자동 꺼짐)" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/ambientSwitch"
+                        style="@style/FateWindow.Switch"
+                        android:checked="true"
+                        android:text="앰비언트 연출  (지원 차량)" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rerollButton"
+                    style="@style/FateWindow.Button.Secondary"
+                    android:text="다른 미션"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/finishButton"
+                    style="@style/FateWindow.Button.Primary"
+                    android:layout_marginStart="20dp"
+                    android:text="완료 · 원상복구"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/startButton"
+                    style="@style/FateWindow.Button.Primary"
+                    android:text="룰렛 돌리기" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 완전 암전 오버레이 (차 실내 암전과 동시에) -->
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="#FFD34D"
-        android:textSize="34sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="참가자 착좌 감지됨"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp" />
-
-    <Spinner
-        android:id="@+id/modeSpinner"
-        android:layout_width="240dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/windowSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:text="창문 연출 사용(비·밤엔 자동 OFF)"
-        android:textColor="#CFCFE0" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/excludeDriverSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="운전자 제외"
-        android:textColor="#CFCFE0" />
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="▶  룰렛 시작"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textColor="#9BE7FF"
-        android:textSize="22sp" />
-</LinearLayout>
+        android:id="@+id/blackout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#000000"
+        android:gravity="center"
+        android:text="운명은…"
+        android:textColor="@color/fw_gold"
+        android:textSize="140sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</FrameLayout>

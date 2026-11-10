@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fw_bg">#0B0B14</color>
+    <color name="fw_surface">#15161F</color>
+    <color name="fw_surface_selected">#2A2412</color>
+    <color name="fw_stroke">#2C2E40</color>
+    <color name="fw_gold">#FFD34D</color>
+    <color name="fw_text">#F4F4FA</color>
+    <color name="fw_text_dim">#9A9AB5</color>
+    <color name="fw_cyan">#3FE0FF</color>
+    <color name="fw_error">#FF8A8A</color>
+</resources>

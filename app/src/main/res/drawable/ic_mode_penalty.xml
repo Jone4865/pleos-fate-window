@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 벌칙: 번개 + 충격 라인 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp" android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#FFD34D" android:strokeColor="#FFD34D" android:strokeWidth="1.5" android:strokeLineJoin="round"
+        android:pathData="M27,4L11,27h10l-3,17 18,-25H26z" />
+    <path android:strokeColor="#FFD34D" android:strokeWidth="2.4" android:strokeLineCap="round"
+        android:pathData="M38,8l4,-3M40,15h5M6,33l-3,3M9,40l-3,4" />
+</vector>

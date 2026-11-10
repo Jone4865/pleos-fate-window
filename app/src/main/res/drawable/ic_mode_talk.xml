@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 스포트라이트 토크: 마이크 + 위에서 떨어지는 조명 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp" android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#33FFD34D" android:pathData="M20,2h8l12,44H8z" />
+    <path android:strokeColor="#FFD34D" android:strokeWidth="2.6"
+        android:pathData="M24,14a5,5 0 0 0 -5,5v8a5,5 0 0 0 10,0v-8a5,5 0 0 0 -5,-5z" />
+    <path android:strokeColor="#FFD34D" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M14,26a10,10 0 0 0 20,0M24,36v6M18,42h12" />
+</vector>

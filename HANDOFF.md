@@ -24,42 +24,54 @@
 - 참고: 공모전 **대상작 '창밖동화'가 "창문 개폐 연출 = SDV 차별화"로 호평** → 본 메커니즘이 심사 코드에 부합.
 
 ## 4. 확인된 SDK 사실(VSS 신호)
-- 독서등 개별제어 `Vehicle.Cabin.Light.Spotlight.Row{n}.{Side}.IsLightOn/.Intensity` ✅
-- 창문 제어 `Vehicle.Cabin.Door.Row{n}.{Side}.Window.Position/.Switch` (쓰기) ✅
-- 착좌 `Vehicle.Cabin.Seat.Row{n}.{Side}.Occupant/.Seating` ✅
-- 주차 `Vehicle.Powertrain...CurrentGear`, `Vehicle.Speed` ✅
-- 비감지 `Vehicle.Body.Windshield.Front.Wiping.Mode` ✅
-- 멘트 `TextToSpeech SDK` ✅ / 앰비언트 색은 차종 옵션 ⚠️
-- 개발환경: Android API 28+, Gradle 8+, Kotlin, Pleos Connect Emulator
+> 2026-11-10 실제 SDK·에뮬레이터로 검증한 내용으로 갱신함 (아래 4-1). 초기 VSS 경로 메모는 참고용으로만 남김.
 
-## 5. 현재 산출물 (git 커밋 완료, 로컬)
+### 4-1. 검증된 사실 (Vehicle SDK `ai.pleos.playground:Vehicle:2.3.2`, Pleos Connect Emulator v2.1.0)
+- **저장소**: `https://nexus-playground.pleos.ai/repository/maven-releases/` (공개, 인증 불필요). 공개 버전은 2.0.3, 2.3.2 뿐 (문서 예시의 2.3.1 없음).
+- **포털 상태**: Vehicle State·NaviHelper는 "사용 가능". **Vehicle Control(창문·조명 제어)·TextToSpeech는 "준비 중"이라 신청 버튼 없음.**
+- **그런데 에뮬레이터에서는 제어가 된다**: `CONTROL_CAR_WINDOWS/LIGHTS` 퍼미션이 normal 레벨이라 설치 시 자동 허용, 차량 서비스가 퍼미션 검사 통과 → HAL 반영 → `onSuccess`.
+- **Virtual Console 필수**: `adb forward tcp:8088 tcp:8088` 후 브라우저 `http://127.0.0.1:8088/`. 하단이 **DDS ONLINE** 이어야 앱의 쓰기가 상태에 반영됨(처음엔 반영 안 돼서 SDK 문제로 오인했었음). 착좌·기어·와이퍼·전조등을 여기서 바꿔 티어 전환 시연 가능.
+- 사용 API: 독서등 `Light.setReadingLightSwitch(SeatArea)`, 암전 `Light.setCabinLightSwitch(OFF)`, 앰비언트 `Light.setAmbientLightSwitch(SeatArea)`, 창문 `Window.setWindowPosition(WindowArea, value)`, 착좌 `Seat.getCurrentSeatOccupancy`, 기어 `Gear.getCurrentGearSelectionState`, 비 `Wiper.getCurrentWiperState/Switch(FRONT_WINDSHIELD)`, 밤 `Light.getCurrentLowBeamLightState`.
+- **창문 값 범위 0~10** (10 = 100%). 차마다 다를 수 있어 `checkWindowPositionCapabilities` 로 읽어 % 환산.
+- **실내등 OFF 는 켜진 독서등도 끈다.** 그 뒤 개별 독서등 ON 은 정상 → "암전 → 당첨석만 점등" 순서 그대로 가능.
+- **차속 API 없음** → 주차 판정은 기어 P 만.
+- 멘트: Pleos TTS 준비 중이라 Android 기본 `TextToSpeech` 사용.
+- 개발환경: Android API 28+, Gradle 8.9(wrapper 포함), Kotlin 2.0, JDK 17
+
+### 4-2. (초기 메모, 참고용) VSS 경로
+- 독서등 `Vehicle.Cabin.Light.Spotlight.Row{n}.{Side}.IsLightOn`, 창문 `Vehicle.Cabin.Door.Row{n}.{Side}.Window.Position`, 착좌 `Vehicle.Cabin.Seat.Row{n}.{Side}.Occupant`, 비 `Vehicle.Body.Windshield.Front.Wiping.Mode`
+
+## 5. 현재 산출물
 ```
 README.md                     기획서(전체)
 HANDOFF.md                    이 문서
-app/ ...                      Kotlin 앱 스켈레톤
+app/ ...                      Kotlin 앱
   game/RouletteEngine.kt      가중치 랜덤 + 회전 시퀀스
-  game/RevealTier.kt          티어 자동 감지
-  game/GameController.kt      라운드 연출 오케스트레이션
-  vehicle/VehicleController.kt SDK 추상 인터페이스
-  vehicle/StubVehicleController.kt  SDK 없이 구동되는 스텁
-  MainActivity.kt + res/      간단 UI
-app/src/test/...              룰렛 엔진 단위테스트
-.github/workflows/android-ci.yml  테스트+APK 자동빌드 CI
+  game/RevealTier.kt          티어 자동 감지 (+앰비언트/창문 옵션)
+  game/GameController.kt      라운드 연출 오케스트레이션 + 완료(창문 닫기·조명 복귀)
+  vehicle/VehicleController.kt      SDK 추상 인터페이스 (suspend)
+  vehicle/PleosVehicleController.kt 실제 Pleos Vehicle SDK 구현 + Android TTS
+  vehicle/StubVehicleController.kt  Pleos 서비스 없는 기기용 스텁 (자동 선택)
+  MainActivity.kt + res/      UI (시작/완료 버튼, 창문·앰비언트·운전자 제외 토글)
+app/src/test/...              룰렛 엔진 + 게임 흐름 단위테스트 (10개)
+gradlew, gradle/wrapper/      Gradle 8.9 wrapper
+.github/workflows/android-ci.yml  main 푸시 시 테스트+APK 자동빌드
 docs/VIDEO_STORYBOARD.md      영상 샷별 콘티
 docs/SUBMISSION_CHECKLIST.md  제출 체크리스트
 ```
-- 상태: **로컬 git 커밋됨, 원격 미푸시.** Android SDK/Pleos SDK 미설치 환경이라 로컬 빌드 안 됨(CI에서 빌드).
+- 상태: `main` 브랜치. 로컬 빌드·테스트 통과, Pleos 에뮬레이터에서 실제 라운드 동작 확인. 원격 미푸시.
+- Pleos Playground 프로젝트 생성 완료: "운명의 창문 (Fate Window)" (카테고리 엔터테인먼트).
 
-## 6. 남은 작업 (담당: 사용자/후속자)
-1. `gh auth login` → GitHub 공개 repo 생성 & 푸시
-2. CI 실행되면 **APK artifact** 다운로드(또는 Android Studio 빌드)
-3. **Pleos Playground 가입 + SDK 액세스 신청**(developers.pleos.ai) → `StubVehicleController` 를 실제 `PleosVehicleController` 로 교체(build.gradle 의존성·settings maven 주석 해제)
-4. **에뮬레이터로 시연 영상 녹화**(콘티대로, 티어1/2/3 각각 시연)
-5. 1차 접수(~11/15 23:59): 기획서 + repo(소스+APK) + 영상 제출 → 단계별 가산점
+## 6. 남은 작업
+1. GitHub 공개 repo 생성 & `main` 푸시 → CI가 APK artifact 생성
+2. **에뮬레이터 + Virtual Console 로 시연 영상 녹화** (콘티대로, 티어1/2/3 각각). 티어 전환은 콘솔에서 와이퍼(비)·전조등(밤) 조작, 앱의 앰비언트 토글로.
+3. (선택) 공모전 문의처에 "Vehicle Control 준비 중 상태에서 에뮬레이터 시연 출품 가능 여부" 확인
+4. (선택) 주행 시작(기어 P 이탈) 감지 시 라운드 즉시 중단 + 창문 원위치 — 기획서 5절에는 있으나 아직 미구현
+5. 1차 접수(~11/15 23:59): 기획서 + repo(소스+APK) + 영상 제출
 
 ## 7. 리스크
-- 실차 창문 actuation 권한(OEM/안전정책) 제약 가능 → 에뮬레이터 데모 기본, "조용한 모드"로 우회.
-- Pleos SDK 실제 패키지명/신호 경로는 공식 문서로 최종 확인.
+- 포털상 Vehicle Control 은 "준비 중" → 실차/마켓 배포 시 제어 권한이 막힐 수 있음. 에뮬레이터 시연 기준으로 출품.
+- 실차 창문 actuation 은 OEM/안전정책 제약 가능 → "창문 연출" 토글 OFF 시 독서등만으로 완결(티어3).
 
 ## 8. 링크
 - 공모전: https://appdevchallenge.auto-hmg.io/guide/development

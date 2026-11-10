@@ -3,14 +3,8 @@ package com.fatewindow.app.vehicle
 import android.util.Log
 
 /**
- * SDK 없이 로직을 돌려보기 위한 스텁.
- * 에뮬레이터/실차 연동 시 PleosVehicleController 로 교체한다.
- *
- * 실제 구현 예시(의사코드):
- *   override fun openWindow(seat, pct) =
- *       vehicle.set("Vehicle.Cabin.Door.Row${seat.row}.${seat.side}.Window.Position", pct)
- *   override fun setSpotlight(seat, on, i) =
- *       vehicle.set("Vehicle.Cabin.Light.Spotlight.Row${seat.row}.${seat.side}.IsLightOn", on)
+ * Pleos 차량 서비스가 없는 기기(일반 폰·태블릿 에뮬레이터)에서 앱을 돌려보기 위한 스텁.
+ * 모든 동작을 로그로만 남긴다.
  */
 class StubVehicleController(
     private val caps: VehicleCapabilities = VehicleCapabilities(
@@ -20,28 +14,23 @@ class StubVehicleController(
         isRaining = false,
         isNight = false
     ),
-    private val seats: List<Seat> = listOf(
-        Seat(1, Seat.Side.DRIVER),
-        Seat(1, Seat.Side.PASSENGER),
-        Seat(2, Seat.Side.DRIVER),
-        Seat(2, Seat.Side.PASSENGER)
-    )
+    private val seats: List<Seat> = Seat.ALL
 ) : VehicleController {
 
-    private val tag = "FateWindow/Vehicle"
+    private val tag = "FateWindow/Stub"
 
-    override fun readCapabilities() = caps
-    override fun occupiedSeats() = seats
-    override fun isParked() = true
+    override suspend fun readCapabilities() = caps
+    override suspend fun occupiedSeats() = seats
+    override suspend fun isParked() = true
 
-    override fun setSpotlight(seat: Seat, on: Boolean, intensity: Int) =
-        Log.d(tag, "spotlight ${seat.label} on=$on i=$intensity")
+    override suspend fun setSpotlight(seat: Seat, on: Boolean) { log("spotlight ${seat.label} on=$on") }
+    override suspend fun setAmbient(seat: Seat, on: Boolean) { log("ambient ${seat.label} on=$on") }
+    override suspend fun allLightsOff() { log("ALL LIGHTS OFF (암전)") }
+    override suspend fun restoreLights() { log("lights restored") }
+    override suspend fun openWindow(seat: Seat, positionPercent: Int) { log("openWindow ${seat.label} $positionPercent%") }
+    override suspend fun closeWindow(seat: Seat) { log("closeWindow ${seat.label}") }
+    override fun speak(text: String) { log("TTS: $text") }
 
-    override fun setAmbientAll(on: Boolean) = Log.d(tag, "ambientAll on=$on")
-    override fun ambientSpin(step: Int) = Log.d(tag, "ambientSpin step=$step")
-    override fun allLightsOff() = Log.d(tag, "ALL LIGHTS OFF (암전)")
-    override fun openWindow(seat: Seat, positionPercent: Int) =
-        Log.d(tag, "openWindow ${seat.label} $positionPercent%")
-    override fun closeWindow(seat: Seat) = Log.d(tag, "closeWindow ${seat.label}")
-    override fun speak(text: String) = Log.d(tag, "TTS: $text")
+    // 단위테스트(JVM)에서는 android.util.Log 가 없으므로 실패해도 무시
+    private fun log(msg: String) { runCatching { Log.d(tag, msg) } }
 }

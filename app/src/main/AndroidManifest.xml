@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 실제 제출 시 Pleos 차량 제어 권한 선언 (SDK 문서 기준):
-         <uses-permission android:name="ai.pleos.permission.VEHICLE_CABIN_CONTROL"/> -->
+    <!-- Pleos 차량 퍼미션 (공식 문서 "Declaring permission"). 조회 CAR_*, 제어 CONTROL_CAR_*.
+         에뮬레이터 v2.1.0 에서는 모두 normal 레벨이라 설치 시 자동 허용됨 (2026-11-10 확인). -->
+    <uses-permission android:name="pleos.car.permission.CAR_SEATS" />          <!-- 착좌 -->
+    <uses-permission android:name="pleos.car.permission.CAR_LIGHTS" />         <!-- 전조등(밤), 조명 상태 -->
+    <uses-permission android:name="pleos.car.permission.CONTROL_CAR_LIGHTS" /> <!-- 실내등·독서등·앰비언트 -->
+    <uses-permission android:name="pleos.car.permission.CAR_WINDOWS" />        <!-- 창문 범위, 와이퍼(비) -->
+    <uses-permission android:name="pleos.car.permission.CONTROL_CAR_WINDOWS" /><!-- 창문 열기/닫기 -->
+    <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />          <!-- 기어 -->
+    <uses-permission android:name="pleos.car.permission.CAR_INFO" />
+
+    <!-- Pleos 차량 서비스 존재 여부 확인용 (없으면 스텁으로 동작) -->
+    <queries>
+        <package android:name="ai.pleos.playground.service.vehicle" />
+    </queries>
 
     <application
         android:allowBackup="true"

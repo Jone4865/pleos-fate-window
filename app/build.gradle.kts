@@ -41,10 +41,10 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // === 실제 제출 시 아래 Pleos SDK 의존성으로 교체 ===
-    // implementation("ai.pleos.sdk:vehicle-sdk:2.3.2")
-    // implementation("ai.pleos.sdk:tts-sdk:1.x")
-    // 현재는 VehicleController 인터페이스 + Stub 구현으로 독립 빌드 가능.
+    // Pleos Vehicle SDK. 저장소 공개 버전은 2.0.3, 2.3.2 (문서 예시의 2.3.1은 없음, 2026-11-10 확인)
+    implementation("ai.pleos.playground:Vehicle:2.3.2")
+    // Pleos TextToSpeech SDK 는 포털에서 "준비 중" → Android 기본 TextToSpeech 로 대체 (PleosVehicleController.speak)
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 }

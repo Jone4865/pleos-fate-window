@@ -10,8 +10,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // 실제 제출 시 Pleos SDK 저장소 추가:
-        // maven { url = uri("https://developers.pleos.ai/maven") }
+        // Pleos SDK 공개 저장소 (공식 문서 "Pleos Connect 앱 개발 시작하기")
+        maven { url = uri("https://nexus-playground.pleos.ai/repository/maven-releases/") }
     }
 }
 rootProject.name = "FateWindow"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 진실 혹은 도전: 말풍선 속 물음표 + 불꽃 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp" android:viewportWidth="48" android:viewportHeight="48">
+    <path android:strokeColor="#FFD34D" android:strokeWidth="2.6" android:strokeLineJoin="round"
+        android:pathData="M6,8h22a4,4 0 0 1 4,4v13a4,4 0 0 1 -4,4H16l-7,6v-6H6a4,4 0 0 1 -4,-4V12a4,4 0 0 1 4,-4z" />
+    <path android:strokeColor="#FFD34D" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M13,15a4,4 0 1 1 5.5,3.7c-1.1,0.5 -1.5,1.2 -1.5,2.3" />
+    <path android:fillColor="#FFD34D" android:pathData="M15.6,24.6a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
+    <path android:fillColor="#FF8A3D"
+        android:pathData="M39,18c0,0 -6,6 -6,12a6,6 0 0 0 12,0c0,-3 -1.8,-5 -1.8,-5s-0.2,3 -2.2,4c0.4,-4.4 -1,-8 -2,-11z" />
+</vector>
