@@ -1,30 +1,27 @@
-# ✅ 제출 체크리스트 — 현대차그룹 차량용 앱 개발 공모전
+# 제출 체크리스트 — 현대차그룹 차량용 앱 개발 공모전
 
 마감: **2026-11-15 23:59** (1차 접수)
 
 ## 제출물
-- [x] 기획서 (`README.md`)
-- [x] 앱 소스코드 (Kotlin, 이 저장소)
-- [x] 룰렛 엔진 단위테스트 (`app/src/test/...`)
-- [ ] **GitHub 공개 저장소** ← `gh auth login` 후 푸시
-- [ ] **APK** ← GitHub Actions 빌드 artifact 또는 Android Studio 빌드
-- [ ] **시연 영상** ← 에뮬레이터 녹화 (`docs/VIDEO_STORYBOARD.md`)
+- [x] 기획서 (`README.md`, 실제 앱 화면 포함)
+- [x] 앱 소스코드 — https://github.com/Jone4865/pleos-fate-window (공개)
+- [x] APK — GitHub Actions `Android CI` 실행 결과의 `fate-window-debug-apk` 아티팩트
+- [x] 시연 영상 원본 — 에뮬레이터 + Virtual Console 녹화 (약 2분 20초) + 자막(.srt)
+- [ ] 영상 편집·업로드 (자막 입히기, 대기 구간 자르기, 나레이션/효과음)
+- [ ] 1차 접수
 
-## 내가(사용자) 해야 하는 것
-1. **GitHub 로그인**: 터미널에서 `gh auth login` (브라우저 인증). → 그 다음 에이전트가 repo 생성·푸시.
-2. **Pleos Playground 가입 & SDK 액세스 신청**: https://developers.pleos.ai
-   - 프로젝트 생성 → Vehicle SDK / TextToSpeech SDK 액세스 요청.
-3. **실제 SDK 연동**: `StubVehicleController` → `PleosVehicleController` 로 교체,
-   `app/build.gradle.kts` 의 Pleos 의존성 주석 해제, `settings.gradle.kts` 의 Pleos maven 저장소 추가.
-4. **에뮬레이터 설치 & 데모 녹화**: Pleos Connect Emulator + Virtual Console.
-5. **APK 서명/빌드**: Android Studio 또는 CI artifact 다운로드.
+## 완료한 것 (2026-11-10)
+- Pleos Playground 가입·프로젝트 생성 ("운명의 창문 (Fate Window)")
+- Vehicle SDK 2.3.2 실제 연동, 에뮬레이터에서 조명·창문 제어 동작 확인
+- 게임 모드 4종, 미션 풀, 차량 디스플레이용 UI, 원근 3D 실내 일러스트
+- 주행 감지 즉시 중단·비상 복구, 앱 이탈 시 복구
+- 단위테스트 16개, CI (테스트 + APK)
 
-## 에이전트가 이미 한 것
-- 기획서 작성·3티어 연출 설계
-- 앱 스켈레톤(룰렛 엔진, 티어 자동감지, SDK 추상화, UI, 단위테스트)
-- GitHub Actions CI (테스트 + APK 자동 빌드)
-- 영상 콘티 / 본 체크리스트
+## 영상 편집 메모
+- 원본에서 대기 구간(약 40~50초, 120~135초)을 잘라내면 90초 안팎
+- 자막 파일 타이밍은 원본 기준
+- TTS 음성은 화면 녹화에 담기지 않음 → 나레이션 또는 효과음으로 보강
+- 마지막에 GitHub 주소 노출
 
 ## 남은 리스크
-- 실차 창문 actuation 권한(OEM 정책) → 에뮬레이터 데모 기본, "조용한 모드"로 우회.
-- Pleos SDK 실제 패키지명·신호 경로는 공식 문서로 최종 확인 필요.
+- 포털상 Vehicle Control 은 "준비 중" → 에뮬레이터 시연 기준으로 출품 (README 12절)

@@ -13,7 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.fatewindow.app.databinding.ActivityMainBinding
 import com.fatewindow.app.game.GameController
 import com.fatewindow.app.game.GameMode
@@ -73,8 +75,16 @@ class MainActivity : AppCompatActivity() {
         binding.ambientSwitch.setOnCheckedChangeListener { _, _ -> refreshVehicleState() }
 
         render(Ui.SETUP)
-        // SDK 서비스 바인딩 시간을 조금 준 뒤 착좌·연출 티어 표시
-        lifecycleScope.launch { delay(1200); refreshVehicleState() }
+        // SDK 서비스 바인딩 시간을 조금 준 뒤, 준비 화면에 있는 동안 착좌·날씨·연출 티어를 주기적으로 갱신
+        lifecycleScope.launch {
+            delay(1200)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    if (ui == Ui.SETUP) refreshVehicleState()
+                    delay(2500)
+                }
+            }
+        }
     }
 
     // ---------------- 준비 화면 구성 ----------------
@@ -148,6 +158,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun selectMode(m: GameMode) {
         mode = m
+        binding.messageText.isVisible = false   // 이전 라운드의 안내 문구는 새 선택 시 지움
         modeCards.forEach { (k, card) ->
             val on = k == m
             card.strokeColor = ContextCompat.getColor(this, if (on) R.color.fw_gold else R.color.fw_stroke)
