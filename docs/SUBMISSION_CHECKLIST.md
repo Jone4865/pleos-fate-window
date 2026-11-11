@@ -10,6 +10,7 @@
 - [x] 영상 업로드 — 릴리스 v1.0: https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4
 - [x] 접수양식(기획서) 작성·서명
 - [x] 이메일 접수 완료 (2026-11-11, appdevchallenge@hyundai-partners.com, 제목 `[차량용 앱 개발 공모전] 운명의창문팀_채종원`)
+- [x] 수정 제출 (2026-11-11, `[수정제출]`): 접수양식 + 시연 영상 720p(23.7MB) 직접 첨부 → 이 메일이 최종본
 
 ## 완료한 것 (2026-11-10)
 - Pleos Playground 가입·프로젝트 생성 ("운명의 창문 (Fate Window)")
