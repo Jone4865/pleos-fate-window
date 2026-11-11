@@ -34,6 +34,15 @@ ROUND_TAPS = [4.2, 35.4, 55.1]          # 룰렛 tap+1.0~4.6, 암전 tap+4.6~6.1
 DRUMS_IN = 4.2                          # 첫 라운드부터 드럼
 OUTRO = 72.3                            # 엔딩 카드
 
+# 선택: 타임라인 설정 파일로 덮어쓰기 (숏폼 등 다른 편집본용)
+if len(sys.argv) > 3:
+    import json
+    CONFIG = json.load(open(sys.argv[3], encoding="utf-8"))
+    CAR_LINES = [tuple(x) for x in CONFIG.get("CAR_LINES", CAR_LINES)]
+    ROUND_TAPS = CONFIG.get("ROUND_TAPS", ROUND_TAPS)
+    DRUMS_IN = CONFIG.get("DRUMS_IN", DRUMS_IN)
+    OUTRO = CONFIG.get("OUTRO", OUTRO)
+
 
 def zeros():
     return array('f', [0.0]) * N

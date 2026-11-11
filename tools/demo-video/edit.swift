@@ -33,7 +33,7 @@ struct Cap: Decodable { let t0: Double; let t1: Double; let text: String }
 struct Card: Decodable { let t0: Double; let t1: Double; let title: String; let sub: String; let lines: [String]; let opacity: Double }
 struct Plan: Decodable { let segments: [Seg]; let captions: [Cap]; let cards: [Card] }
 
-let W: CGFloat = 1920, H: CGFloat = 1080
+var W: CGFloat = 1920, H: CGFloat = 1080
 let gold = CGColor(red: 1, green: 0.827, blue: 0.302, alpha: 1)
 
 func font(_ size: CGFloat, bold: Bool = true) -> NSFont {
@@ -102,17 +102,18 @@ func cardLayer(_ c: Card) -> CALayer {
     bg.type = .radial
     bg.startPoint = CGPoint(x: 0.5, y: 0.5); bg.endPoint = CGPoint(x: 1.2, y: 1.2)
     root.addSublayer(bg)
-    var y = H / 2 + 120
-    let title = textLayer(c.title, size: 128, color: gold, width: 1700)
-    title.frame.origin = CGPoint(x: (W - title.frame.width) / 2, y: y); root.addSublayer(title)
-    y -= 90
-    let sub = textLayer(c.sub, size: 46, color: CGColor(gray: 0.88, alpha: 1), bold: false, width: 1700)
-    sub.frame.origin = CGPoint(x: (W - sub.frame.width) / 2, y: y); root.addSublayer(sub)
-    y -= 40
-    for line in c.lines {
-        y -= 64
-        let l = textLayer(line, size: 38, color: CGColor(red: 0.6, green: 0.88, blue: 1, alpha: 1), bold: false, width: 1700)
-        l.frame.origin = CGPoint(x: (W - l.frame.width) / 2, y: y); root.addSublayer(l)
+    // 위에서 아래로 실제 높이만큼 쌓기 (여러 줄 부제가 제목과 겹치지 않게)
+    let title = textLayer(c.title, size: 128, color: gold, width: min(1700, W - 120))
+    let sub = textLayer(c.sub, size: 46, color: CGColor(gray: 0.88, alpha: 1), bold: false, width: min(1700, W - 120))
+    let lines = c.lines.map { textLayer($0, size: 38, color: CGColor(red: 0.6, green: 0.88, blue: 1, alpha: 1), bold: false, width: min(1700, W - 120)) }
+    let gapTitle: CGFloat = 36, gapSub: CGFloat = 48, gapLine: CGFloat = 18
+    let block = title.frame.height + gapTitle + sub.frame.height + gapSub + lines.reduce(0) { $0 + $1.frame.height + gapLine }
+    var y = (H + block) / 2                          // 블록 윗변 (원점 좌하단)
+    y -= title.frame.height; title.frame.origin = CGPoint(x: (W - title.frame.width) / 2, y: y); root.addSublayer(title)
+    y -= gapTitle + sub.frame.height; sub.frame.origin = CGPoint(x: (W - sub.frame.width) / 2, y: y); root.addSublayer(sub)
+    y -= gapSub
+    for l in lines {
+        y -= l.frame.height; l.frame.origin = CGPoint(x: (W - l.frame.width) / 2, y: y); root.addSublayer(l); y -= gapLine
     }
     showDuring(root, c.t0, c.t1, maxOpacity: Float(c.opacity))
     return root
@@ -171,8 +172,101 @@ func render() {
     print("ok \(String(format: "%.1f", total.seconds))s -> \(out.path)")
 }
 
+
+// ---------------- vrender (세로 9:16 숏폼) ----------------
+struct VPlan: Decodable {
+    let segments: [Seg]; let headlines: [Cap]; let captions: [Cap]; let cards: [Card]
+    let crop: [Double]; let videoTop: Double; let footer: String; let brand: String
+}
+
+func vrender() {
+    W = 1080; H = 1920
+    let src = AVURLAsset(url: URL(fileURLWithPath: args[2]))
+    let plan = try! JSONDecoder().decode(VPlan.self, from: Data(contentsOf: URL(fileURLWithPath: args[3])))
+    let audio = AVURLAsset(url: URL(fileURLWithPath: args[4]))
+    let out = URL(fileURLWithPath: args[5])
+    try? FileManager.default.removeItem(at: out)
+    guard let vSrc = src.tracks(withMediaType: .video).first else { fail("no video track") }
+
+    let comp = AVMutableComposition()
+    let vTrack = comp.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)!
+    var cursor = CMTime.zero
+    for s in plan.segments {
+        let r = CMTimeRange(start: CMTime(seconds: s.start, preferredTimescale: 600), end: CMTime(seconds: s.end, preferredTimescale: 600))
+        try! vTrack.insertTimeRange(r, of: vSrc, at: cursor)
+        cursor = cursor + r.duration
+    }
+    let total = cursor
+    if let aSrc = audio.tracks(withMediaType: .audio).first {
+        let aTrack = comp.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)!
+        try! aTrack.insertTimeRange(CMTimeRange(start: .zero, duration: min(audio.duration, total)), of: aSrc, at: .zero)
+    }
+
+    // 원본(1920x1080)에서 앱 화면만 잘라 가로 폭에 맞춤. 영상 좌표는 원점 좌상단
+    let crop = CGRect(x: plan.crop[0], y: plan.crop[1], width: plan.crop[2], height: plan.crop[3])
+    let sc = W / crop.width
+    let vidH = crop.height * sc
+    let top = CGFloat(plan.videoTop)
+    let li = AVMutableVideoCompositionLayerInstruction(assetTrack: vTrack)
+    li.setCropRectangle(crop, at: .zero)
+    li.setTransform(CGAffineTransform(translationX: -crop.minX, y: -crop.minY)
+        .concatenating(CGAffineTransform(scaleX: sc, y: sc))
+        .concatenating(CGAffineTransform(translationX: 0, y: top)), at: .zero)
+
+    // 오버레이 (CALayer 원점 좌하단)
+    let parent = CALayer(); parent.frame = CGRect(x: 0, y: 0, width: W, height: H)
+    let videoLayer = CALayer(); videoLayer.frame = parent.frame
+    parent.addSublayer(videoLayer)
+    let videoTopY = H - top                  // 영상 윗변 (CALayer 좌표)
+    let videoBottomY = H - top - vidH        // 영상 아랫변
+    let dark1 = CGColor(red: 0.08, green: 0.09, blue: 0.16, alpha: 1), dark2 = CGColor(red: 0.02, green: 0.02, blue: 0.05, alpha: 1)
+    let topBand = CAGradientLayer(); topBand.frame = CGRect(x: 0, y: videoTopY, width: W, height: top)
+    topBand.colors = [dark1, dark2]; parent.addSublayer(topBand)
+    let botBand = CAGradientLayer(); botBand.frame = CGRect(x: 0, y: 0, width: W, height: videoBottomY)
+    botBand.colors = [dark2, dark1]; parent.addSublayer(botBand)
+    for y in [videoTopY, videoBottomY - 3] {                 // 영상 위아래 금색 라인
+        let line = CALayer(); line.frame = CGRect(x: 0, y: y, width: W, height: 3); line.backgroundColor = gold; parent.addSublayer(line)
+    }
+    let brand = textLayer(plan.brand, size: 40, color: gold, width: W - 120)
+    brand.frame.origin = CGPoint(x: (W - brand.frame.width) / 2, y: H - 150); parent.addSublayer(brand)
+    let foot = textLayer(plan.footer, size: 32, color: CGColor(gray: 0.72, alpha: 1), bold: false, width: W - 100)
+    foot.frame.origin = CGPoint(x: (W - foot.frame.width) / 2, y: 80); parent.addSublayer(foot)
+    for h in plan.headlines {
+        let l = textLayer(h.text, size: 78, color: CGColor.white, width: W - 100)
+        let bandBottom = videoTopY, bandTop = H - 170
+        l.frame.origin = CGPoint(x: (W - l.frame.width) / 2, y: bandBottom + (bandTop - bandBottom - l.frame.height) / 2)
+        showDuring(l, h.t0, h.t1); parent.addSublayer(l)
+    }
+    for c in plan.captions {
+        let l = textLayer(c.text, size: 50, color: CGColor(red: 1, green: 0.86, blue: 0.45, alpha: 1), width: W - 120)
+        let bandBottom: CGFloat = 160, bandTop = videoBottomY
+        l.frame.origin = CGPoint(x: (W - l.frame.width) / 2, y: bandBottom + (bandTop - bandBottom - l.frame.height) / 2)
+        showDuring(l, c.t0, c.t1); parent.addSublayer(l)
+    }
+    plan.cards.forEach { parent.addSublayer(cardLayer($0)) }
+
+    let vc = AVMutableVideoComposition()
+    vc.renderSize = CGSize(width: W, height: H)
+    vc.frameDuration = CMTime(value: 1, timescale: 30)
+    let ins = AVMutableVideoCompositionInstruction()
+    ins.timeRange = CMTimeRange(start: .zero, duration: total)
+    ins.backgroundColor = dark2
+    ins.layerInstructions = [li]
+    vc.instructions = [ins]
+    vc.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parent)
+
+    guard let ex = AVAssetExportSession(asset: comp, presetName: AVAssetExportPresetHighestQuality) else { fail("no export session") }
+    ex.outputURL = out; ex.outputFileType = .mp4; ex.videoComposition = vc
+    let sem = DispatchSemaphore(value: 0)
+    ex.exportAsynchronously { sem.signal() }
+    sem.wait()
+    if ex.status != .completed { fail("export failed: \(String(describing: ex.error))") }
+    print("ok vertical \(String(format: "%.1f", total.seconds))s -> \(out.path)")
+}
+
 switch args.count > 1 ? args[1] : "" {
 case "frames": frames()
 case "render": render()
+case "vrender": vrender()
 default: fail("usage: frames|render ...")
 }

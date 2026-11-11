@@ -9,3 +9,9 @@ macOS 기본 기능만 사용 (AVFoundation, `say`, `afconvert`, Python 표준 �
 5. 확인용 프레임: `./edit frames out.mp4 <폴더> 1.5 12.0 ...`
 
 자막 글자는 CATextLayer 대신 비트맵으로 그린다 (오프라인 렌더에서 CATextLayer 글자가 그려지지 않음).
+
+## 세로 숏폼 (1080×1920)
+
+- `python3 -I audio.py <작업폴더> 37.4 audio_shortform.json` → 숏폼 타임라인용 오디오
+- `./edit vrender fate-raw.mp4 plan_shortform.json <작업폴더>/track.wav short.mp4`
+- `plan_shortform.json`: 원본 구간, 앱 화면 크롭 영역, 위(헤드라인)·아래(자막) 문구, 엔딩 카드
