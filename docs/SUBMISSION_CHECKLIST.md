@@ -8,8 +8,8 @@
 - [x] APK — 저장소 `apk/운명의창문팀_운명의창문_release.apk` (서명된 release 빌드, 공식 파일명 규칙 `팀명_앱이름_release.apk`) + Release v1.0
 - [x] 시연 영상 완성본 — 78초, 1920×1080, 자막·나레이션·효과음·타이틀 카드 포함 (편집 도구: `tools/demo-video/`)
 - [x] 영상 업로드 — 릴리스 v1.0: https://github.com/Jone4865/pleos-fate-window/releases/download/v1.0/fate-window-demo.mp4
-- [x] 접수양식(기획서) 작성 — 서명·동의 체크·휴대폰번호만 남음
-- [ ] 이메일 접수 (appdevchallenge@hyundai-partners.com)
+- [x] 접수양식(기획서) 작성·서명
+- [x] 이메일 접수 완료 (2026-11-11, appdevchallenge@hyundai-partners.com, 제목 `[차량용 앱 개발 공모전] 운명의창문팀_채종원`)
 
 ## 완료한 것 (2026-11-10)
 - Pleos Playground 가입·프로젝트 생성 ("운명의 창문 (Fate Window)")
